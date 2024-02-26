@@ -1,5 +1,5 @@
 SHELL := /bin/bash
-.PHONY: help deps build
+.PHONY: help deps build generate
 
 LD_FLAGS=-ldflags="-s -w"
 
@@ -17,3 +17,7 @@ build: ## build tsdb tester binary
 
 run: ## run demo
 	go run github.com/lindb/tsdb-tester/cmd
+
+generate: ## generate test data
+	go run github.com/lindb/tsdb-tester/cmd/generate
+

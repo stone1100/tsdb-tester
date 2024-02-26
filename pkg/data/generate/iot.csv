@@ -1,0 +1,10 @@
+latitude,1
+velocity,2
+grade,3
+fuel_consumption,4
+fuel_state,5
+status,6
+longitude,7
+elevation,8
+heading,9
+current_load,10

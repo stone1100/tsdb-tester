@@ -1,7 +1,6 @@
-package pkg
+package util
 
 import (
-	"bufio"
 	"bytes"
 	"fmt"
 	"reflect"
@@ -10,6 +9,8 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/pmezard/go-difflib/difflib"
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 )
 
 var spewConfig = spew.ConfigState{
@@ -29,7 +30,7 @@ var spewConfigStringerEnabled = spew.ConfigState{
 	MaxDepth:                10,
 }
 
-func trim(str string, suffixes ...string) string {
+func Trim(str string, suffixes ...string) string {
 	for _, suffix := range suffixes {
 		str = strings.TrimSpace(str)
 		str = strings.TrimSuffix(str, suffix)
@@ -37,7 +38,7 @@ func trim(str string, suffixes ...string) string {
 	return str
 }
 
-func equal(expected, actual interface{}) (bool, string) {
+func Equal(expected, actual interface{}) (bool, string) {
 	if !ObjectsAreEqual(expected, actual) {
 		expected, actual = formatUnequalValues(expected, actual)
 		return false, fmt.Sprintf("Not equal: \n"+
@@ -153,9 +154,26 @@ func formatUnequalValues(expected, actual interface{}) (e string, a string) {
 // bufio.MaxScanTokenSize max line length that the go testing framework imposes.
 func truncatingFormat(data interface{}) string {
 	value := fmt.Sprintf("%#v", data)
-	max := bufio.MaxScanTokenSize - 100 // Give us some space the type info too if needed.
+	max := 1024 // Give us some space the type info too if needed.
 	if len(value) > max {
 		value = value[0:max] + "<... truncated>"
 	}
 	return value
+}
+
+// SetupConfigFile defines the settings for the configuration file support.
+func SetupConfigFile() error {
+	viper.SetConfigName("config")
+	viper.AddConfigPath(".")
+
+	viper.BindPFlags(pflag.CommandLine)
+
+	if err := viper.ReadInConfig(); err != nil {
+		// Ignore error if config file not found.
+		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+			return err
+		}
+	}
+
+	return nil
 }

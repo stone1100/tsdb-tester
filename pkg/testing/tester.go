@@ -1,4 +1,4 @@
-package pkg
+package testing
 
 import (
 	"bytes"
@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"github.com/fatih/color"
+
+	"github.com/lindb/tsdb-tester/pkg/util"
 )
 
 type Tester struct {
@@ -48,7 +50,7 @@ func (t *Tester) Run() (success, fail int32) {
 			fail++
 			msg = err.Error()
 		} else {
-			ok, errMsg := equal(results[i].data, string(data))
+			ok, errMsg := util.Equal(results[i].data, string(data))
 			if ok {
 				success++
 			} else {
@@ -99,7 +101,7 @@ func (t *Tester) loadResults() (results []Result) {
 		newStmt = strings.HasSuffix(s, ";")
 		if newStmt {
 			results = append(results, Result{
-				data: trim(stmt, ";"),
+				data: util.Trim(stmt, ";"),
 			})
 			stmt = ""
 		}
@@ -109,7 +111,7 @@ func (t *Tester) loadResults() (results []Result) {
 
 func (t *Tester) setting(stmt string) {
 	if strings.HasPrefix(stmt, "@use") {
-		t.database = trim(strings.TrimPrefix(stmt, "@use"), ";")
+		t.database = util.Trim(strings.TrimPrefix(stmt, "@use"), ";")
 	}
 }
 
@@ -152,7 +154,7 @@ func (t *Tester) loadQueries() (statments []Statement) {
 		if newStmt {
 			statments = append(statments, Statement{
 				desc: strings.TrimSpace(desc),
-				sql:  trim(stmt, ";"),
+				sql:  util.Trim(stmt, ";"),
 			})
 			desc = ""
 			stmt = ""

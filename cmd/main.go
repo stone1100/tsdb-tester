@@ -12,7 +12,7 @@ import (
 	"github.com/fatih/color"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/lindb/tsdb-tester/pkg"
+	"github.com/lindb/tsdb-tester/pkg/testing"
 )
 
 var (
@@ -31,7 +31,7 @@ func main() {
 		log.Fatalf("load all tests err %v", err)
 	}
 	wait.Add(len(tests))
-	cli := pkg.NewClient(url)
+	cli := testing.NewClient(url)
 
 	totalSuccess := &atomic.Int32{}
 	totalFail := &atomic.Int32{}
@@ -40,7 +40,7 @@ func main() {
 		tt := tests[i]
 		go func() {
 			defer wait.Done()
-			tr := pkg.NewTester(tt, cli)
+			tr := testing.NewTester(tt, cli)
 			success, fail := tr.Run()
 			totalSuccess.Add(success)
 			totalFail.Add(fail)
